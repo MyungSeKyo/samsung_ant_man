@@ -10,4 +10,5 @@ class DailyStock(models.Model):
     volume = models.IntegerField()
 
     def __str__(self):
-        return self.id
+        return str(self.id)
+
