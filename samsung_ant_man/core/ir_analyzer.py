@@ -1,3 +1,4 @@
+import pickle
 import urllib.request
 from operator import itemgetter
 from xml.dom import minidom
@@ -7,7 +8,7 @@ from dateutil import parser as date_parser
 from goose3 import Goose
 from requests import get
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-
+from django.conf import settings
 # from stocks.models import WordProsCons, DailyStock
 from stocks.models import DailyStock
 
@@ -25,13 +26,13 @@ def analyze_doc(doc):
     vect.fit(doc)
     documentItems = vect.vocabulary_
     documentKey = vect.vocabulary_.keys()
-    matrixKey = MATRIX.keys()
+    matrixKey = settings.MATRIX.keys()
     docuscore = 0
     resultdict=[]
     for key in documentKey:
         if key in matrixKey:
-            docuscore += MATRIX[key]*documentItems[key]
-            resultdict.append({key:MATRIX[key]*documentItems[key]})
+            docuscore += settings.MATRIX[key]*documentItems[key]
+            resultdict.append({key:settings.MATRIX[key]*documentItems[key]})
     
     return resultdict[:5]+resultdict[-5:] #: return top 5 and lowest 5
     #return docuscore : final score for this document
@@ -46,36 +47,45 @@ def analyze_word(word):
     result:
     None/Float value
     """
-    matrixKey = MATRIX.keys()
+    matrixKey = settings.MATRIX.keys()
     if word not in matrixKey:
         return None
     else:
         return matrixKey[word]
 
 
-def _build_matrix():
-    daily_updown = DailyStock.objects.all().order_by("diff_yesterday")
-    daily_updown = daily_updown.values('id', 'diff_yesterday')
+def _build_matrix(chunk=15):
 
-    minval = abs(min(map(itemgetter('diff_yesterday'), daily_updown)))
-    maxval = abs(max(map(itemgetter('diff_yesterday'), daily_updown)))
-    if minval > maxval:
-        daily_updown = [dict(d, diff_yesterday=(
-            d['diff_yesterday']) / minval) for d in daily_updown]
-    else:
-        daily_updown = [dict(d, diff_yesterday=(
-            d['diff_yesterday']) / maxval) for d in daily_updown]
+    # daily_updown = DailyStock.objects.all().order_by("diff_yesterday")
+    # daily_updown = daily_updown.values('year', 'month', 'date', 'diff_yesterday')
+    #
+    # minval = abs(min(map(itemgetter('diff_yesterday'), daily_updown)))
+    # maxval = abs(max(map(itemgetter('diff_yesterday'), daily_updown)))
+    # if minval > maxval:
+    #     daily_updown = [dict(d, diff_yesterday=(
+    #         d['diff_yesterday']) / minval) for d in daily_updown]
+    # else:
+    #     daily_updown = [dict(d, diff_yesterday=(
+    #         d['diff_yesterday']) / maxval) for d in daily_updown]
+
+    up_days = list(DailyStock.objects.order_by('diff_yesterday')[:chunk])
+    down_days = list(DailyStock.objects.order_by('-diff_yesterday')[:chunk])
+
+    max_diff = max(up_days[0].diff_yesterday, abs(down_days[0].diff_yesterday))
+    daily_updown = up_days + down_days
+
+    for daily in daily_updown:
+        daily.diff_yesterday = daily.diff_yesterday / max_diff
 
     text_dict = {}
     days_text_list = []
-    for things in daily_updown:
+    for daily in daily_updown:
         # dateconversion
-        things['id'] = str(things['id'])
-        print(things['id'])
-        LINK = 'https://news.google.com/rss/search?q=samsung+electronics+when:{}-{}-{}&hl=en-US&gl=US&ceid=US:en'.format(
-            things['id'][:4],
-            things['id'][4:6],
-            things['id'][6:],
+        print(daily)
+        LINK = 'https://news.google.com/rss/search?q=samsung+electronics+when:{}-{:02d}-{:02d}&hl=en-US&gl=US&ceid=US:en'.format(
+            daily.year,
+            daily.month,
+            daily.date,
         )
         print(LINK)
         xmldoc = minidom.parse(urllib.request.urlopen(LINK, timeout=10))
@@ -115,6 +125,9 @@ def _build_matrix():
         stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b')
     bag_of_words = vectorizer.fit_transform(scripts)
     value_word = pd.DataFrame(bag_of_words.toarray()).mul(
-        list(map(lambda d: d['diff_yesterday'], daily_updown)), axis=0).sum(axis=0)
+        list(map(lambda d: d.diff_yesterday, daily_updown)), axis=0).sum(axis=0)
     string_word = vectorizer.get_feature_names()
-    return {string_word[i]: value_word[i] for i in range(len(string_word))}
+    word_dict = {string_word[i]: value_word[i] for i in range(len(string_word))}
+    with open('word_dict_pickle', 'wb') as f:
+        pickle.dump(word_dict, f)
+    return word_dict
