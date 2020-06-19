@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from stocks.models import DailyStock
 
 
 class IndexView(TemplateView):
@@ -6,18 +7,8 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        context['daily_stock_values'] = [
-            '10000',
-            '20000',
-            '30000',
-            '40000',
-            '20000',
-        ]
-        context['daily_stock_labels'] = [
-            '20200101',
-            '20200101',
-            '20200101',
-            '20200101',
-            '20200101',
-        ]
+        daily_stocks = DailyStock.objects.filter(date=1).all()
+        context['latest_stock'] = DailyStock.objects.last()
+        context['stock_prices'] = list(map(lambda x: x.current_price, daily_stocks))
+        context['stock_labels'] = list(map(lambda x: str(x), daily_stocks))
         return context
