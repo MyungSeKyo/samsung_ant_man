@@ -1,23 +1,56 @@
 import urllib.request
 from operator import itemgetter
+from xml.dom import minidom
 
 import pandas as pd
 from dateutil import parser as date_parser
 from goose3 import Goose
 from requests import get
-from sklearn.feature_extraction.text import TfidfVectorizer
-from xml.dom import minidom
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 # from stocks.models import WordProsCons, DailyStock
 from stocks.models import DailyStock
 
 
 def analyze_doc(doc):
-    return [("단어", 0.5, 0.5),]
+    """
+    matrix comes here
+    MATRIX={word:value,word2:value2}
+
+    result: 
+    [{word:value,word2:value2}]
+    
+    """
+    vect = CountVectorizer(stop_words="english")
+    vect.fit(doc)
+    documentItems = vect.vocabulary_
+    documentKey = vect.vocabulary_.keys()
+    matrixKey = MATRIX.keys()
+    docuscore = 0
+    resultdict=[]
+    for key in documentKey:
+        if key in matrixKey:
+            docuscore += MATRIX[key]*documentItems[key]
+            resultdict.append({key:MATRIX[key]*documentItems[key]})
+    
+    return resultdict[:5]+resultdict[-5:] #: return top 5 and lowest 5
+    #return docuscore : final score for this document
+    #return [("??", 0.5, 0.5), ]
 
 
 def analyze_word(word):
-    return (0.5, 0.5)
+    """
+    matrix comes here
+    MATRIX={word:value,word2:value2}
+
+    result:
+    None/Float value
+    """
+    matrixKey = MATRIX.keys()
+    if word not in matrixKey:
+        return None
+    else:
+        return matrixKey[word]
 
 
 def _build_matrix():
@@ -27,9 +60,11 @@ def _build_matrix():
     minval = abs(min(map(itemgetter('diff_yesterday'), daily_updown)))
     maxval = abs(max(map(itemgetter('diff_yesterday'), daily_updown)))
     if minval > maxval:
-        daily_updown = [dict(d, diff_yesterday=(d['diff_yesterday']) / minval) for d in daily_updown]
+        daily_updown = [dict(d, diff_yesterday=(
+            d['diff_yesterday']) / minval) for d in daily_updown]
     else:
-        daily_updown = [dict(d, diff_yesterday=(d['diff_yesterday']) / maxval) for d in daily_updown]
+        daily_updown = [dict(d, diff_yesterday=(
+            d['diff_yesterday']) / maxval) for d in daily_updown]
 
     text_dict = {}
     days_text_list = []
@@ -52,8 +87,10 @@ def _build_matrix():
             if doccount > 10:
                 break
             print(items)
-            singlelink = items.getElementsByTagName('link')[0].firstChild.nodeValue
-            pubdate = items.getElementsByTagName('pubDate')[0].firstChild.nodeValue
+            singlelink = items.getElementsByTagName(
+                'link')[0].firstChild.nodeValue
+            pubdate = items.getElementsByTagName(
+                'pubDate')[0].firstChild.nodeValue
             date = date_parser.parse(pubdate).strftime("%Y%m%d")
             try:
                 response = get(singlelink, timeout=10)
