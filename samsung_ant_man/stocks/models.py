@@ -17,3 +17,11 @@ class DailyStock(models.Model):
 
     def __str__(self):
         return '{}/{:02d}/{:02d}'.format(self.year, self.month, self.date)
+
+
+class DailyDocument(models.Model):
+    doc = models.TextField()
+    is_up = models.BooleanField()
+
+    def __str__(self):
+        return str(self.is_up)
