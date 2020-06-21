@@ -10,7 +10,7 @@ from requests import get
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from django.conf import settings
 # from stocks.models import WordProsCons, DailyStock
-from stocks.models import DailyStock
+from stocks.models import DailyStock, DailyDocument
 
 
 def analyze_doc(doc):
@@ -22,8 +22,8 @@ def analyze_doc(doc):
     [{word:value,word2:value2}]
     
     """
-    vect = CountVectorizer(stop_words="english")
-    vect.fit(doc)
+    vect = CountVectorizer(stop_words="english", token_pattern=r'(?u)\b[A-Za-z]+\b')
+    bag_of_words = vect.fit([doc])
     documentItems = vect.vocabulary_
     documentKey = vect.vocabulary_.keys()
     matrixKey = settings.MATRIX.keys()
@@ -47,11 +47,7 @@ def analyze_word(word):
     result:
     None/Float value
     """
-    matrixKey = settings.MATRIX.keys()
-    if word not in matrixKey:
-        return None
-    else:
-        return matrixKey[word]
+    return settings.MATRIX.get(word)
 
 
 def _build_matrix(chunk=15):
@@ -118,6 +114,10 @@ def _build_matrix(chunk=15):
                     print('this')
                     pass
         days_text_list.append(today_text)
+        DailyDocument.objects.create(
+            doc=today_text,
+            is_up=daily.diff_yesterday > 0
+        )
 
     scripts = days_text_list
     len(days_text_list)
