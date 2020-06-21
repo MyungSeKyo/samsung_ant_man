@@ -55,9 +55,9 @@
                     SAMSUNG Ant Man
                 </h1>
                 <div class="input-group">
-                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search keyword!" aria-label="Search" aria-describedby="basic-addon2">
+                    <input id="headerInput" type="text" class="form-control bg-light border-0 small" placeholder="Search keyword!" aria-label="Search" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-info" type="button">
+                        <button id="headerInputBtn" class="btn btn-info" type="button">
                             <i class="fas fa-search fa-sm"></i>
                         </button>
                     </div>
@@ -525,6 +525,22 @@
                 }
             }
         }
+    });
+
+
+    $(function () {
+        $('#headerInputBtn').click(function () {
+            const doc = $('#headerInput').val();
+
+            $.ajax({
+                url: "{% url 'stocks:analyze' %}",
+                method: "POST",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    doc: doc
+                }
+            })
+        });
     });
 
 </script>
