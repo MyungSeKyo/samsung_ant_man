@@ -23,20 +23,23 @@ def analyze_doc(doc):
     
     """
     vect = CountVectorizer(stop_words="english", token_pattern=r'(?u)\b[A-Za-z]+\b')
-    bag_of_words = vect.fit([doc])
-    documentItems = vect.vocabulary_
-    documentKey = vect.vocabulary_.keys()
-    matrixKey = settings.MATRIX.keys()
-    docuscore = 0
-    resultdict=[]
-    for key in documentKey:
-        if key in matrixKey:
-            docuscore += settings.MATRIX[key]*documentItems[key]
-            resultdict.append({key:settings.MATRIX[key]*documentItems[key]})
-    
-    return resultdict[:5]+resultdict[-5:] #: return top 5 and lowest 5
-    #return docuscore : final score for this document
-    #return [("??", 0.5, 0.5), ]
+    bag_of_words = vect.fit_transform([doc])
+    words = vect.get_feature_names()
+    word_dict = vect.vocabulary_
+    array = bag_of_words.toarray()
+
+    doc_score = 0
+    related_words = []
+    for word in words:
+        if word in settings.MATRIX:
+            count = array[0][word_dict[word]]
+            score = count * settings.MATRIX[word]
+            doc_score += score
+            related_words.append((word, score))
+    return {
+        'score': doc_score,
+        'words': related_words
+    }
 
 
 def analyze_word(word):
