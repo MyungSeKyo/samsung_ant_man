@@ -53,8 +53,8 @@ class AnalyzeDoc(View):
                         'value': val / total,
                         'size': ceil((val / max_val) * max_size),
                     })
-            ret['positive_words'] = sorted(ret['positive_words'], key=lambda x: x['value'])
-            ret['negative_words'] = sorted(ret['negative_words'], key=lambda x: x['value'])
+            ret['positive_words'] = sorted(ret['positive_words'], key=lambda x: x['value'], reverse=True)[:30]
+            ret['negative_words'] = sorted(ret['negative_words'], key=lambda x: x['value'])[:30]
             return JsonResponse(ret)
         else:
             return JsonResponse(result)
