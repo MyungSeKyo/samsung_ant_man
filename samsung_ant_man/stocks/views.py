@@ -1,4 +1,5 @@
 import json
+from math import ceil
 
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -26,8 +27,37 @@ class IndexView(TemplateView):
 class AnalyzeDoc(View):
     def post(self, request, *args, **kwargs):
         doc = request.POST.get('doc', 'china is attacking')
-        analyze_doc(doc)
-        return JsonResponse({})
+        result = analyze_doc(doc)
+
+        if result['is_valid']:
+            total = sum(map(lambda x: abs(x[1]), result['words']))
+            max_val = max(map(lambda x: abs(x[1]), result['words']))
+            max_size = 100
+            ret = {
+                'score': result['score'],
+                'is_valid': result['is_valid'],
+                'negative_words': [],
+                'positive_words': [],
+            }
+
+            for word, val in result['words']:
+                if val < 0:
+                    ret['negative_words'].append({
+                        'word': word,
+                        'value': val / total,
+                        'size': ceil((val / max_val) * max_size),
+                    })
+                else:
+                    ret['positive_words'].append({
+                        'word': word,
+                        'value': val / total,
+                        'size': ceil((val / max_val) * max_size),
+                    })
+            ret['positive_words'] = sorted(ret['positive_words'], key=lambda x: x['value'])
+            ret['negative_words'] = sorted(ret['negative_words'], key=lambda x: x['value'])
+            return JsonResponse(ret)
+        else:
+            return JsonResponse(result)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
