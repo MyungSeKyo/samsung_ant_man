@@ -55,7 +55,7 @@
                     SAMSUNG Ant Man
                 </h1>
                 <div class="input-group">
-                    <input id="headerInput" type="text" class="form-control bg-light border-0 small" placeholder="Search keyword!" aria-label="Search" aria-describedby="basic-addon2">
+                    <input maxlength="100" id="headerInput" type="text" class="form-control bg-light border-0 small" placeholder="Search keyword!" aria-label="Search" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                         <button id="headerInputBtn" class="btn btn-info" type="button">
                             <i class="fas fa-search fa-sm"></i>
@@ -190,7 +190,7 @@
                             </div>
                             <!-- Card Body -->
                             <div class="card-body" style="height: 360px">
-                                <textarea id="textarea" class="mb-4" style="width: 100%; max-height: 240px;height: 240px; border: 1px solid rgb(227, 230, 240);background: rgb(248, 249, 252); padding: 10px 20px" placeholder="Search Document!"></textarea>
+                                <textarea id="textarea" class="mb-4" style="width: 100%; max-height: 240px;height: 240px; border: 1px solid rgb(227, 230, 240);background: rgb(248, 249, 252); padding: 10px 20px" placeholder="Search Document!" maxlength="3000"></textarea>
                                 <div style="text-align: right">
                                     <button id="bottomInputBtn" class="btn btn-info btn-icon-split">
                                         <span class="text">Search Document</span>
@@ -202,57 +202,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-12 col-lg-12">
+                    <div class="col-xl-12 col-lg-12" id="resultCard">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Search Document</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Search Result</h6>
                             </div>
                             <!-- Card Body -->
-                            <div class="card-body" >
-                                <div id="cloud"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-12 col-lg-12">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">result</h6>
-                            </div>
-                            <!-- Card Body -->
-                            <div class="card-body" >
-                                <div>
-
-                                </div>
-                                <div class="mb-4">
+                            <div class="card-body row" >
+                                <div class="col-xl-6 col-lg-12 mb-4">
                                     <h2>Positive</h2>
                                     <table class="table table-sm">
                                         <thead>
                                         <tr class="bg-primary text-white">
-                                            <th scope="col">rank</th>
+                                            <th scope="col">#</th>
                                             <th scope="col">word</th>
                                             <th scope="col">weight</th>
                                         </tr>
                                         </thead>
                                         <tbody id="positiveTable">
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry the Bird</td>
-                                            <td>Larry the Bird</td>
-                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div>
+                                <div class="col-xl-6 col-lg-12 mb-4">
                                     <h2>Negative</h2>
                                     <table class="table table-sm">
                                         <thead>
@@ -264,23 +235,6 @@
                                         </tr>
                                         </thead>
                                         <tbody id="negativeTable">
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                            <td>@mdo</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                            <td>@fat</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td colspan="2">Larry the Bird</td>
-                                            <td>@twitter</td>
-                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -461,6 +415,7 @@
 
 
     $(function () {
+        $('#resultCard').hide();
         $('#headerInputBtn').click(function () {
             const doc = $('#headerInput').val();
             $.ajax({
@@ -510,12 +465,13 @@
         $negativeTable.empty();
         for(let i in data['negative_words']){
             const word = data['negative_words'][i];
-            $negativeTable.append($(`<tr><th scope="row"></th><td>${word.word}</td><td>${word.value}</td></tr>`))
+            $negativeTable.append($(`<tr><th scope="row">${i}</th><td>${word.word}</td><td>${word.value}</td></tr>`))
         }
         for(let i in data['positive_words']){
             const word = data['positive_words'][i];
-            $positiveTable.append($(`<tr><th scope="row"></th><td>${word.word}</td><td>${word.value}</td></tr>`))
+            $positiveTable.append($(`<tr><th scope="row">${i}</th><td>${word.word}</td><td>${word.value}</td></tr>`))
         }
+        $('#resultCard').slideDown();
     }
     function makeWordCloud(myWords) {
         // set the dimensions and margins of the graph
