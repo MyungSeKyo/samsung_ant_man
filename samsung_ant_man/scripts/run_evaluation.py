@@ -19,6 +19,7 @@ def run():
 
     P = tp / (tp+fp)
     R = tp / (tp+fn)
-
+    print('Precision: {}'.format(P))
+    print('Recall: {}'.format(R))
     F = (2*P*R) / (P+R)
-    print(F)
+    print('F-measure: {}'.format(F))
