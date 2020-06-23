@@ -8,6 +8,11 @@ from goose3 import Goose
 from requests import get
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from xml.dom import minidom
+import re
+from nltk.tag import pos_tag, untag
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+
 
 # from stocks.models import WordProsCons, DailyStock
 from stocks.models import DailyStock, DailyDocument
@@ -76,7 +81,7 @@ def _build_matrix(chunk=15):
     # else:
     #     daily_updown = [dict(d, diff_yesterday=(
     #         d['diff_yesterday']) / maxval) for d in daily_updown]
-
+    documents = []
     up_days = list(DailyStock.objects.order_by('diff_yesterday')[:chunk])
     down_days = list(DailyStock.objects.order_by('-diff_yesterday')[:chunk])
 
@@ -133,10 +138,56 @@ def _build_matrix(chunk=15):
         )
 
     scripts = days_text_list
-    len(days_text_list)
+    lemmatizer = WordNetLemmatizer()
+
+    for sen in range(0, len(scripts)):
+        # Remove all the special characters
+        document = re.sub(r'\W', ' ', str(scripts[sen]))
+
+        # remove all single characters
+        document = re.sub(r'\s+[a-zA-Z]\s+', ' ', document)
+
+        # Remove single characters from the start
+        document = re.sub(r'\^[a-zA-Z]\s+', ' ', document)
+
+        # Substituting multiple spaces with single space
+        document = re.sub(r'\s+', ' ', document, flags=re.I)
+
+        # Converting to Lowercase
+        document = document.lower()
+
+        # Lemmatization
+        document = document.split()
+        doc = pos_tag(document)
+        final_doc = []
+
+        for i in range(len(doc)):
+            if doc[i][1] in ['NN', 'NNP', 'NNS', 'NNPS']:
+                document[i] = lemmatizer.lemmatize(document[i], 'n')
+                final_doc.append(document[i])
+
+            elif doc[i][1] in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']:
+                document[i] = lemmatizer.lemmatize(document[i], 'v')
+                final_doc.append(document[i])
+
+
+            elif doc[i][1] in ['JJ', 'JJR', 'JJS']:
+                document[i] = lemmatizer.lemmatize(document[i], 'a')
+                final_doc.append(document[i])
+
+            elif doc[i][1] in ['RB', 'RBR', 'RBS', 'RP']:
+                document[i] = lemmatizer.lemmatize(document[i], 'r')
+                final_doc.append(document[i])
+
+            else:
+                final_doc.append(document[i])
+
+        pre_document = ' '.join(final_doc)
+        documents.append(pre_document)
+
     vectorizer = TfidfVectorizer(
         stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b')
-    bag_of_words = vectorizer.fit_transform(scripts)
+    bag_of_words = vectorizer.fit_transform(documents)
     value_word = pd.DataFrame(bag_of_words.toarray()).mul(
         list(map(lambda d: d.diff_yesterday, daily_updown)), axis=0).sum(axis=0)
     string_word = vectorizer.get_feature_names()
