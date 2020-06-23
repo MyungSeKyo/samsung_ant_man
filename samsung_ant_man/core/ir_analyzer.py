@@ -1,14 +1,14 @@
 import pickle
 import urllib.request
-from operator import itemgetter
-from xml.dom import minidom
 
 import pandas as pd
 from dateutil import parser as date_parser
+from django.conf import settings
 from goose3 import Goose
 from requests import get
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from django.conf import settings
+from xml.dom import minidom
+
 # from stocks.models import WordProsCons, DailyStock
 from stocks.models import DailyStock, DailyDocument
 
@@ -22,6 +22,12 @@ def analyze_doc(doc):
     [{word:value,word2:value2}]
     
     """
+    if not doc:
+        return {
+            'score': 0,
+            'words': [],
+            'is_valid': False
+        }
     vect = CountVectorizer(stop_words="english", token_pattern=r'(?u)\b[A-Za-z]+\b')
     bag_of_words = vect.fit_transform([doc])
     words = vect.get_feature_names()
@@ -30,15 +36,19 @@ def analyze_doc(doc):
 
     doc_score = 0
     related_words = []
+    is_valid = False
     for word in words:
         if word in settings.MATRIX:
+            is_valid = True
             count = array[0][word_dict[word]]
             score = count * settings.MATRIX[word]
             doc_score += score
             related_words.append((word, score))
+
     return {
         'score': doc_score,
-        'words': related_words
+        'words': related_words,
+        'is_valid': is_valid
     }
 
 
