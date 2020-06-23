@@ -208,35 +208,53 @@
                                 <h6 class="m-0 font-weight-bold text-primary">Search Result</h6>
                             </div>
                             <!-- Card Body -->
-                            <div class="card-body row" >
-                                <div class="col-xl-6 col-lg-12 mb-4">
-                                    <h2>Positive</h2>
-                                    <table class="table table-sm">
-                                        <thead>
-                                        <tr class="bg-primary text-white">
-                                            <th scope="col">#</th>
-                                            <th scope="col">word</th>
-                                            <th scope="col">weight</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="positiveTable">
-                                        </tbody>
-                                    </table>
+                            <div class="card-body" >
+                                <div>
+                                    <h3 id="resultMessage" class="mb-4">
+                                    </h3>
                                 </div>
-                                <div class="col-xl-6 col-lg-12 mb-4">
-                                    <h2>Negative</h2>
-                                    <table class="table table-sm">
-                                        <thead>
-                                        <tr class="bg-danger text-white">
-                                            <th scope="col">#</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">Handle</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="negativeTable">
-                                        </tbody>
-                                    </table>
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-12 mb-4">
+                                        <h2>Positive</h2>
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr class="bg-primary text-white">
+                                                <th scope="col">#</th>
+                                                <th scope="col">word</th>
+                                                <th scope="col">weight</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="positiveTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-12 mb-4">
+                                        <h2>Negative</h2>
+                                        <table class="table table-sm">
+                                            <thead>
+                                            <tr class="bg-danger text-white">
+                                                <th scope="col">#</th>
+                                                <th scope="col">word</th>
+                                                <th scope="col">weight</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="negativeTable">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12" id="resultEmptyCard">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Search Result</h6>
+                            </div>
+                            <!-- Card Body -->
+                            <div class="card-body row" >
+                                <div style="text-align: center">
+                                    <h1 style="text-align: center">Sorry! There are no valid keywords.</h1>
                                 </div>
                             </div>
                         </div>
@@ -416,6 +434,7 @@
 
     $(function () {
         $('#resultCard').hide();
+        $('#resultEmptyCard').hide();
         $('#headerInputBtn').click(function () {
             const doc = $('#headerInput').val();
             $.ajax({
@@ -458,7 +477,25 @@
         });
 
     });
+    function scrollTo(selector) {
+        document.querySelector(selector).scrollIntoView({ behavior: 'smooth' })
+    }
     function makeTable(data) {
+        document.getElementById("resultCard").scrollIntoView( {behavior: "smooth" })
+        if(data.is_valid === 0){
+            $('#resultEmptyCard').slideDown();
+            $('#resultCard').slideUp();
+            return
+        }
+        if(data.score > 0 ){
+            msg = 'positive';
+        } else {
+            msg = 'negative';
+        }
+        $('#resultMessage').html(
+            `The document score is ${data.score}.<br>I guess it is ${msg}`
+        )
+        $('#resultEmptyCard').slideUp();
         let $positiveTable = $('#positiveTable');
         let $negativeTable = $('#negativeTable');
         $positiveTable.empty();

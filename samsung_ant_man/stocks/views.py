@@ -28,7 +28,7 @@ class AnalyzeDoc(View):
     def post(self, request, *args, **kwargs):
         doc = request.POST.get('doc', 'china is attacking')
         result = analyze_doc(doc)
-
+        result['is_valid'] = 1 if result['is_valid'] else 0
         if result['is_valid']:
             total = sum(map(lambda x: abs(x[1]), result['words']))
             max_val = max(map(lambda x: abs(x[1]), result['words']))
