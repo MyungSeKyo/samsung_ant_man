@@ -72,7 +72,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Closing Price</div>
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Close Price</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ latest_stock.end_price | intcomma }} ₩</div>
                                     </div>
                                     {#                                    <div class="col-auto">#}
@@ -88,7 +88,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">전일비</div>
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">24H change</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ latest_stock.diff_yesterday | intcomma }} ₩</div>
                                     </div>
                                     {#                                    <div class="col-auto">#}
@@ -104,7 +104,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">시가</div>
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Last Price</div>
                                         <div class="row no-gutters align-items-center">
                                             <div class="col-auto">
                                                 <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{ latest_stock.current_price | intcomma }} ₩</div>
@@ -124,7 +124,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">고가</div>
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Daily High</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ latest_stock.high_price | intcomma }} ₩</div>
                                     </div>
                                     {#                                    <div class="col-auto">#}
@@ -140,7 +140,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">저가</div>
+                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Daily Low</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ latest_stock.row_price | intcomma }} ₩</div>
                                     </div>
                                     {#                                    <div class="col-auto">#}
@@ -156,7 +156,7 @@
                             <div class="card-body">
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">거래량</div>
+                                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Volume</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ latest_stock.volume | intcomma }} ₩</div>
                                     </div>
                                     {#                                    <div class="col-auto">#}
