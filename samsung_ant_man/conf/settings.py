@@ -28,7 +28,7 @@ SECRET_KEY = ')=xrdw(vjt)l_1)=^m!e63-$h$y#icj)mu*u(u4@khi^b9fjkh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['samsung-ant-man.kro.kr', 'www.samsung-ant-man.kro.kr']
+ALLOWED_HOSTS = ['samsung-ant-man.kro.kr', 'www.samsung-ant-man.kro.kr', 'localhost']
 
 
 # Application definition

@@ -186,7 +186,7 @@ def _build_matrix(chunk=15):
         documents.append(pre_document)
 
     vectorizer = TfidfVectorizer(
-        stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b', max_df=0.7)
+        stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b', max_df=0.9)
     bag_of_words = vectorizer.fit_transform(documents)
     value_word = pd.DataFrame(bag_of_words.toarray()).mul(
         list(map(lambda d: d.diff_yesterday, daily_updown)), axis=0).sum(axis=0)
