@@ -28,7 +28,7 @@ SECRET_KEY = ')=xrdw(vjt)l_1)=^m!e63-$h$y#icj)mu*u(u4@khi^b9fjkh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['samsung-ant-man.kro.kr', 'www.samsung-ant-man.kro.kr']
 
 
 # Application definition
@@ -128,6 +128,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "../static")
 
 with open('word_dict_pickle', 'rb') as f:
     MATRIX = pickle.load(f)
