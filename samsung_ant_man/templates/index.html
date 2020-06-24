@@ -237,6 +237,7 @@
                             </div>
                         </div>
                     </div>
+                    <div id="scrollPoint" class="col-xl-12 col-lg-12"></div>
                     <div class="col-xl-12 col-lg-12" id="resultCard">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -516,7 +517,7 @@
         document.querySelector(selector).scrollIntoView({ behavior: 'smooth' })
     }
     function makeTable(data) {
-        document.getElementById("resultCard").scrollIntoView( {behavior: "smooth" })
+        document.getElementById("scrollPoint").scrollIntoView( {behavior: "smooth" })
         if(data.is_valid === 0){
             $('#resultEmptyCard').slideDown();
             $('#resultCard').slideUp();
