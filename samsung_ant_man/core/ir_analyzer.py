@@ -170,7 +170,6 @@ def _build_matrix(chunk=15):
                 document[i] = lemmatizer.lemmatize(document[i], 'v')
                 final_doc.append(document[i])
 
-
             elif doc[i][1] in ['JJ', 'JJR', 'JJS']:
                 document[i] = lemmatizer.lemmatize(document[i], 'a')
                 final_doc.append(document[i])
@@ -179,14 +178,15 @@ def _build_matrix(chunk=15):
                 document[i] = lemmatizer.lemmatize(document[i], 'r')
                 final_doc.append(document[i])
 
-            else:
-                final_doc.append(document[i])
+
+            #else:
+            #    final_doc.append(document[i])
 
         pre_document = ' '.join(final_doc)
         documents.append(pre_document)
 
     vectorizer = TfidfVectorizer(
-        stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b')
+        stop_words='english', token_pattern=r'(?u)\b[A-Za-z]+\b', max_df=0.7)
     bag_of_words = vectorizer.fit_transform(documents)
     value_word = pd.DataFrame(bag_of_words.toarray()).mul(
         list(map(lambda d: d.diff_yesterday, daily_updown)), axis=0).sum(axis=0)
