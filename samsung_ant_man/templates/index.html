@@ -305,7 +305,7 @@
         <!-- End of Main Content -->
 
         <!-- Footer -->
-        <footer class="sticky-footer bg-white">
+        <footer class="sticky-footer bg-white" id="footer">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
                     <span>Copyright &copy; Samsung Ant Man 2020</span>
@@ -517,7 +517,7 @@
         document.querySelector(selector).scrollIntoView({ behavior: 'smooth' })
     }
     function makeTable(data) {
-        document.getElementById("scrollPoint").scrollIntoView( {behavior: "smooth" })
+        document.getElementById("footer").scrollIntoView( {behavior: "smooth" })
         if(data.is_valid === 0){
             $('#resultEmptyCard').slideDown();
             $('#resultCard').slideUp();
